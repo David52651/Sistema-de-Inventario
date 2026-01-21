@@ -9,7 +9,7 @@ function initializeApp() {
   showTab('dashboard');
 }
 
-function showTab(tabName) {
+function showTab(tabName, button = null) {
   document.querySelectorAll('.tab-content').forEach(tab => {
     tab.classList.remove('active');
   });
@@ -19,7 +19,10 @@ function showTab(tabName) {
   });
 
   document.getElementById(tabName).classList.add('active');
-  event.target.classList.add('active');
+
+  if (button) {
+    button.classList.add('active');
+  }
 
   currentTab = tabName;
 

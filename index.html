@@ -5,156 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Inventario</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="js/app.js" defer></script>
 </head>
 <body>
 
-    <div class="app-container">
+<div class="app-container">
 
-        <!-- SIDEBAR -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <h1>Sistema de Inventario</h1>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>Sistema de Inventario</h1>
+        </div>
+
+        <ul class="nav-menu">
+            <li><a class="nav-link active" onclick="showTab('dashboard')">📊 Dashboard</a></li>
+            <li><a class="nav-link" onclick="showTab('productos')">📦 Nuevo producto</a></li>
+            <li><a class="nav-link" onclick="showTab('movimientos')">📋 Movimientos</a></li>
+            <li><a class="nav-link" onclick="showTab('inventario')">📊 Inventario</a></li>
+            <li><a class="nav-link" onclick="showTab('reportes')">📈 Reportes</a></li>
+            <li><a class="nav-link" onclick="showTab('buscar')">🔍 Buscar</a></li>
+            <li><a class="nav-link" onclick="showTab('configuracion')">⚙️ Configuración</a></li>
+        </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="tab-content active">
+            <h2>Dashboard General</h2>
+            <div id="statsGrid"></div>
+
+            <div class="card">
+                <h3>Alertas de Stock</h3>
+                <button onclick="loadDashboard()">Actualizar</button>
+                <button onclick="showStockAlerts()">Ver Alertas</button>
+                <div id="alertsContainer"></div>
             </div>
+        </section>
 
-            <ul class="nav-menu">
-                <li><a class="nav-link active" onclick="showTab('dashboard')">📊 Dashboard</a></li>
-                <li><a class="nav-link" onclick="showTab('productos')">📦 Nuevo producto</a></li>
-                <li><a class="nav-link" onclick="showTab('movimientos')">📋 Movimientos</a></li>
-                <li><a class="nav-link" onclick="showTab('inventario')">📊 Inventario</a></li>
-                <li><a class="nav-link" onclick="showTab('reportes')">📈 Reportes</a></li>
-                <li><a class="nav-link" onclick="showTab('buscar')">🔍 Buscar</a></li>
-                <li><a class="nav-link" onclick="showTab('configuracion')">⚙️ Configuración</a></li>
-            </ul>
-        </nav>
+        <!-- PRODUCTOS -->
+        <section id="productos" class="tab-content">
+            <h2>Gestión de Productos</h2>
 
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
+            <form id="formProducto">
+                <label>Código *</label>
+                <input id="codigoProd" type="text" required>
 
-            <!-- DASHBOARD -->
-            <section id="dashboard" class="tab-content active">
-                <h2>Dashboard General</h2>
-                <div id="statsGrid"></div>
+                <label>Nombre *</label>
+                <input id="nombreProd" type="text" required>
 
-                <div class="card">
-                    <h3>Alertas de Stock</h3>
-                    <button onclick="loadDashboard()">Actualizar</button>
-                    <button onclick="showStockAlerts()">Ver Alertas</button>
-                    <div id="alertsContainer"></div>
-                </div>
-            </section>
+                <label>Unidad</label>
+                <select id="unidadProd"></select>
 
-            <!-- PRODUCTOS -->
-            <section id="productos" class="tab-content">
-                <h2>Gestión de Productos</h2>
+                <label>Grupo</label>
+                <select id="grupoProd"></select>
 
-                <form id="formProducto">
-                    <label>Código *</label>
-                    <input id="codigoProd" type="text" required>
+                <label>Stock mínimo</label>
+                <input id="stockMinProd" type="number">
 
-                    <label>Nombre *</label>
-                    <input id="nombreProd" type="text" required>
+                <button type="submit">Registrar</button>
+                <button type="button">Limpiar</button>
+            </form>
 
-                    <label>Unidad</label>
-                    <select id="unidadProd"></select>
+            <div id="msgProd"></div>
+        </section>
 
-                    <label>Grupo</label>
-                    <select id="grupoProd"></select>
+        <!-- MOVIMIENTOS -->
+        <section id="movimientos" class="tab-content">
+            <h2>Registro de Movimientos</h2>
 
-                    <label>Stock mínimo</label>
-                    <input id="stockMinProd" type="number">
+            <form id="formMovimiento">
+                <label>Código Producto</label>
+                <input id="codigoMov" type="text">
+                <div id="autocompleteDropdown"></div>
 
-                    <button type="submit">Registrar</button>
-                    <button type="button">Limpiar</button>
-                </form>
+                <label>Fecha</label>
+                <input id="fechaMov" type="date">
 
-                <div id="msgProd"></div>
-            </section>
+                <label>Tipo</label>
+                <select id="tipoMov">
+                    <option>INGRESO</option>
+                    <option>SALIDA</option>
+                    <option>AJUSTE_POSITIVO</option>
+                    <option>AJUSTE_NEGATIVO</option>
+                </select>
 
-            <!-- MOVIMIENTOS -->
-            <section id="movimientos" class="tab-content">
-                <h2>Registro de Movimientos</h2>
+                <label>Cantidad</label>
+                <input id="cantMov" type="number">
 
-                <form id="formMovimiento">
-                    <label>Código Producto</label>
-                    <input id="codigoMov" type="text">
-                    <div id="autocompleteDropdown"></div>
+                <label>Observaciones</label>
+                <textarea id="obsMov"></textarea>
 
-                    <label>Fecha</label>
-                    <input id="fechaMov" type="date">
+                <button type="submit">Guardar</button>
+                <button type="button">Limpiar</button>
+            </form>
 
-                    <label>Tipo</label>
-                    <select id="tipoMov">
-                        <option>INGRESO</option>
-                        <option>SALIDA</option>
-                        <option>AJUSTE_POSITIVO</option>
-                        <option>AJUSTE_NEGATIVO</option>
-                    </select>
+            <div id="msgMov"></div>
+        </section>
 
-                    <label>Cantidad</label>
-                    <input id="cantMov" type="number">
+        <!-- INVENTARIO -->
+        <section id="inventario" class="tab-content">
+            <h2>Control de Inventario</h2>
 
-                    <label>Observaciones</label>
-                    <textarea id="obsMov"></textarea>
+            <button>Actualizar</button>
+            <button>Exportar</button>
+            <button>Alertas</button>
 
-                    <button type="submit">Guardar</button>
-                    <button type="button">Limpiar</button>
-                </form>
+            <div id="loading"></div>
+            <div id="stockTable"></div>
+        </section>
 
-                <div id="msgMov"></div>
-            </section>
+        <!-- REPORTES -->
+        <section id="reportes" class="tab-content">
+            <h2>Reportes</h2>
 
-            <!-- INVENTARIO -->
-            <section id="inventario" class="tab-content">
-                <h2>Control de Inventario</h2>
+            <input id="fechaDesde" type="date">
+            <input id="fechaHasta" type="date">
+            <select id="filtroTipo"></select>
 
-                <button>Actualizar</button>
-                <button>Exportar</button>
-                <button>Alertas</button>
+            <button>Generar</button>
+            <button>Exportar</button>
 
-                <div id="loading"></div>
-                <div id="stockTable"></div>
-            </section>
+            <div id="historialTable"></div>
+        </section>
 
-            <!-- REPORTES -->
-            <section id="reportes" class="tab-content">
-                <h2>Reportes</h2>
+        <!-- BUSCAR -->
+        <section id="buscar" class="tab-content">
+            <h2>Búsqueda</h2>
+            <input id="buscarTexto" type="text">
+            <div id="resultadosBusqueda"></div>
+        </section>
 
-                <input id="fechaDesde" type="date">
-                <input id="fechaHasta" type="date">
-                <select id="filtroTipo"></select>
+        <!-- CONFIGURACIÓN -->
+        <section id="configuracion" class="tab-content">
+            <h2>Configuración</h2>
 
-                <button>Generar</button>
-                <button>Exportar</button>
+            <button>Validar</button>
+            <button>Inicializar</button>
+            <button>Limpiar</button>
+            <button>Reset</button>
 
-                <div id="historialTable"></div>
-            </section>
+            <div id="configResults"></div>
+        </section>
 
-            <!-- BUSCAR -->
-            <section id="buscar" class="tab-content">
-                <h2>Búsqueda</h2>
-                <input id="buscarTexto" type="text">
-                <div id="resultadosBusqueda"></div>
-            </section>
+    </main>
+</div>
 
-            <!-- CONFIGURACIÓN -->
-            <section id="configuracion" class="tab-content">
-                <h2>Configuración</h2>
+<!-- ================= JS ================= -->
 
-                <button>Validar</button>
-                <button>Inicializar</button>
-                <button>Limpiar</button>
-                <button>Reset</button>
-
-                <div id="configResults"></div>
-            </section>
-
-        </main>
-    </div>
-<!-- Utils y helpers (primero) -->
+<!-- Utils -->
 <script src="js/utils.js"></script>
 
-<!-- Núcleo de la app -->
+<!-- Núcleo -->
 <script src="js/app.js"></script>
 
 <!-- Funcionalidades -->
