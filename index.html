@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <body onload="initializeApp()">
+  <div class="app-container">
+   <nav class="sidebar">
+  <div class="sidebar-header">
+    <h1>Sistema de Inventario</h1>
+  </div>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <a class="nav-link active" onclick="showTab('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" onclick="showTab('productos', this)">
+        <span class="nav-icon">📦</span> Nuevo producto
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" onclick="showTab('movimientos', this)">
+        <span class="nav-icon">📋</span> Movimientos
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" onclick="showTab('inventario', this)">
+        <span class="nav-icon">📊</span> Inventario
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" onclick="showTab('reportes', this)">
+        <span class="nav-icon">📈</span> Reportes
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" onclick="showTab('buscar', this)">
+        <span class="nav-icon">🔍</span> Buscar
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" onclick="showTab('configuracion', this)">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </li>
+  </ul>
+</nav>
+
+
+    <div class="main-content">
+      <div id="dashboard" class="tab-content active">
+        <div class="content-header">
+          <h2>Dashboard General</h2>
+        </div>
+        <div class="content-body">
+          <div class="stats-grid" id="statsGrid"></div>
+          <div class="card">
+            <div class="card-header">Alertas de Stock</div>
+            <div class="card-body">
+              <div class="actions">
+                <button class="btn btn-primary" onclick="loadDashboard()">
+                  Actualizar Dashboard
+                </button>
+                <button class="btn btn-warning" onclick="showStockAlerts()">
+                  Ver Alertas de Stock
+                </button>
+              </div>
+              <div class="charts-grid">
+  <div class="card">
+    <div class="card-header">Movimientos por Tipo</div>
+    <div class="card-body">
+      <canvas id="graficoMovimientosTipo"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Movimientos por Día</div>
+    <div class="card-body">
+      <canvas id="chartMovimientosFecha"></canvas>
+    </div>
+  </div>
+</div>
+              <div id="alertsContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div id="productos" class="tab-content">
+  <div class="content-header">
+    <h2>Gestión de Productos</h2>
+  </div>
+
+  <div class="content-body">
+    <div class="card">
+      <div class="card-header">Registrar Nuevo Producto</div>
+
+      <div class="card-body">
+        <form id="formProducto" onsubmit="registrarProducto(event)">
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label for="nombreProd">Nombre *</label>
+              <input id="nombreProd" type="text" placeholder="Nombre del producto" required>
+            </div>
+
+            <div class="form-group">
+              <label for="unidadProd">Unidad de Medida</label>
+              <select id="unidadProd" required></select>
+            </div>
+
+            <div class="form-group">
+              <label for="grupoProd">Grupo</label>
+              <select id="grupoProd" required></select>
+            </div>
+
+            <div class="form-group">
+              <label for="stockMinProd">Stock Mínimo</label>
+              <input id="stockMinProd" type="number" min="0" value="0">
+            </div>
+
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-success">
+              Registrar Producto
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="limpiarFormProducto()">
+              Limpiar
+            </button>
+          </div>
+        </form>
+
+        <div id="msgProd"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <div id="movimientos" class="tab-content">
+        <div class="content-header">
+          <h2>Registro de Movimientos</h2>
+        </div>
+        <div class="content-body">
+          <div class="card">
+            <div class="card-header">Nuevo Movimiento</div>
+            <div class="card-body">
+              <form id="formMovimiento" onsubmit="registrarMovimiento(event)">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="codigoMov">Código del Producto *</label>
+                    <div class="autocomplete-container">
+                      <input id="codigoMov" type="text" placeholder="Código del producto" required 
+                             onkeyup="buscarProductoAutocompletado()" 
+                             onblur="ocultarAutocompletado()" 
+                             onfocus="mostrarAutocompletado()">
+                      <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="fechaMov">Fecha *</label>
+                    <input id="fechaMov" type="date" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="tipoMov">Tipo de Movimiento *</label>
+                    <select id="tipoMov" required onchange="handleTipoChange()">
+                      <option value="INGRESO">Ingreso</option>
+                      <option value="SALIDA">Salida</option>
+                      <option value="AJUSTE_POSITIVO">Ajuste Positivo</option>
+                      <option value="AJUSTE_NEGATIVO">Ajuste Negativo</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="cantMov">Cantidad *</label>
+                    <input id="cantMov" type="number" min="0.01" step="0.01" placeholder="Cantidad" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="obsMov">Observaciones</label>
+                    <textarea id="obsMov" placeholder="Observaciones opcionales" rows="3"></textarea>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn btn-success">
+                    Guardar Movimiento
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="limpiarFormMovimiento()">
+                    Limpiar
+                  </button>
+                </div>
+              </form>
+              <div id="msgMov"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="inventario" class="tab-content">
+        <div class="content-header">
+          <h2>Control de Inventario</h2>
+        </div>
+        <div id="msgInv" class="message"></div>
+        <div class="content-body">
+          <div class="card">
+            <div class="card-header">Stock Actual</div>
+            <div class="card-body">
+              <div class="actions">
+                <button class="btn btn-primary" onclick="mostrarStock()">
+                  Actualizar Stock
+                </button>
+                <button class="btn btn-success" onclick="exportarStock()">
+                  Exportar CSV
+                </button>
+                <button class="btn btn-warning" onclick="mostrarAlertas()">
+                  Solo Alertas
+                </button>
+                <button class="btn btn-secondary" onclick="mostrarEliminados()">
+                  Ver Productos eliminados
+                </button>
+              </div>
+              <div id="loading" class="loading">Cargando inventario...</div>
+              <div class="table-container">
+                <div id="stockTable"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="modalEditar" class="modal hidden">
+  <div class="modal-content">
+    <h3>Editar producto</h3>
+
+    <label>Nombre</label>
+    <input type="text" id="editNombre">
+
+    <label>Unidad</label>
+    <select id="editUnidad"></select>
+
+    <label>Grupo</label>
+    <select id="editGrupo"></select>
+
+    <label>Stock mínimo</label>
+    <input type="number" id="editStockMin" min="0">
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="guardarEdicionProducto()">Guardar</button>
+      <button class="btn btn-secondary" onclick="cerrarModalEditar()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+      <div id="reportes" class="tab-content">
+        <div class="content-header">
+          <h2>Reportes y Análisis</h2>
+        </div>
+        <div class="content-body">
+          <div class="card">
+            <div class="card-header">Historial de Movimientos</div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="fechaDesde">Fecha Desde</label>
+                  <input id="fechaDesde" type="date" required>
+                </div>
+                <div class="form-group">
+                  <label for="fechaHasta">Fecha Hasta</label>
+                  <input id="fechaHasta" type="date" required>
+                </div>
+                <div class="form-group">
+                  <label for="filtroTipo">Filtrar por Tipo</label>
+                  <select id="filtroTipo">
+                    <option value="">Todos los movimientos</option>
+                    <option value="Ingreso">Solo Ingresos</option>
+                    <option value="Salida">Solo Salidas</option>
+                    <option value="Ajuste Positivo">Solo Ajustes Positivos</option>
+                    <option value="Ajuste Negativo">Solo Ajustes Negativos</option>
+                  </select>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn btn-primary" onclick="mostrarHistorial()">
+                  Generar Reporte
+                </button>
+                <button class="btn btn-success" onclick="exportarReporte()">
+                  Exportar Reporte
+                </button>
+              </div>
+              <div class="table-container">
+                <div id="historialTable"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="buscar" class="tab-content">
+        <div class="content-header">
+          <h2>Búsqueda de Productos</h2>
+        </div>
+        <div class="content-body">
+          <div class="card">
+            <div class="card-header">Buscar Productos</div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="buscarTexto">Buscar por código, nombre o grupo</label>
+                  <input id="buscarTexto" type="text" placeholder="Escriba para buscar..." onkeyup="buscarEnTiempoReal()">
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn btn-primary" onclick="buscarProducto()">
+                  Buscar
+                </button>
+                <button class="btn btn-secondary" onclick="limpiarBusqueda()">
+                  Limpiar
+                </button>
+              </div>
+              <div class="table-container">
+                <div id="resultadosBusqueda"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="configuracion" class="tab-content">
+        <div class="content-header">
+          <h2>Configuración del Sistema</h2>
+        </div>
+        <div class="content-body">
+          <div class="card">
+            <div class="card-header">Herramientas de Administración</div>
+            <div class="card-body">
+              <div class="actions">
+                <button class="btn btn-info" onclick="validarIntegridad()">
+                  Validar Integridad
+                </button>
+                <button class="btn btn-success" onclick="inicializarSistema()">
+                  Inicializar Sistema
+                </button>
+                <button class="btn btn-warning" onclick="limpiarTodosFormularios()">
+                  Limpiar Todo
+                </button>
+                <button class="btn btn-danger" onclick="confirmarReset()">
+                  Reset Sistema
+                </button>
+              </div>
+              <div id="configResults"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/front.js"></script>
+
+</body>
+</html>
